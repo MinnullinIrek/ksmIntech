@@ -50,7 +50,7 @@ void Widget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0,0,-3);
+    glTranslatef(0, 0, -3);
 
     glRotatef(m_xRotate, 1, 0, 0);
     glRotatef(m_yRotate, 0, 1, 0);
@@ -59,7 +59,7 @@ void Widget::paintGL()
 
     createFlat();
     drawTrack();
-    drawLine(xTimer, yTimer , zTimer);
+    drawLine(xTimer, yTimer - flatSize, zTimer + flatSize);
 
 }
 
@@ -82,9 +82,9 @@ void Widget::createFlat( )
     glBegin(GL_QUADS);
         qglColor(Qt::green);
 
-        glVertex3f(-flatSize, -flatSize , flatSize);
-        glVertex3f(flatSize, -flatSize , flatSize );
-        glVertex3f(flatSize , -flatSize , -flatSize );
+        glVertex3f(-flatSize,  -flatSize, flatSize);
+        glVertex3f(flatSize,   -flatSize, flatSize );
+        glVertex3f(flatSize ,  -flatSize, -flatSize );
         glVertex3f(-flatSize , -flatSize, -flatSize );
     glEnd();
 }
@@ -94,12 +94,12 @@ void Widget::drawLine(double x, double y, double z)
     z -= lineSize;
 
     auto x1 = x;
-    auto z1 = z + flatSize;
+    auto z1 = z ;
 
     auto x2 = x + lineSize*sin(alpha*3.14/180);
-    auto z2 = z + lineSize*cos(alpha*3.14/180)+ flatSize;
+    auto z2 = z + lineSize*cos(alpha*3.14/180);
 
-    lines.push_back(Line(x1, - flatSize + 0.01,  z1, x2, - flatSize + 0.01 , z2));
+    lines.push_back(Line(x1, y,  z1, x2, y, z2));
 
     GLUquadricObj *quadObj;
     quadObj = gluNewQuadric();
@@ -107,10 +107,10 @@ void Widget::drawLine(double x, double y, double z)
     qglColor(Qt::red);
     gluQuadricDrawStyle(quadObj, GLU_FILL);
 
-    glTranslated(x , y - flatSize , z + flatSize );
+    glTranslated(x, y, z);
 
-    glRotated(alpha, 0,1,0);
-    glColor3d(1,0,0);
+    glRotated(alpha, 0, 1, 0);
+    glColor3d(1, 0, 0);
     gluCylinder(quadObj, 0.01, 0.01, lineSize, 15, 15);
 
     gluDeleteQuadric(quadObj);
@@ -119,7 +119,7 @@ void Widget::drawLine(double x, double y, double z)
 void Widget::drawTrack()
 {
     glLineWidth(5);
-    glBegin(GL_LINES);
+    glBegin(GL_QUAD_STRIP);
     qglColor(Qt::blue);
 
     for(auto line:lines) {

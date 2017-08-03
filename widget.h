@@ -29,7 +29,7 @@ protected:
     GLfloat xTimer = 0;
     GLfloat yTimer = 0.05;
     GLfloat zTimer = 0;
-    GLfloat alpha = 0;
+    GLfloat alpha  = 0;
 
     QTimer timer;
     QList<Line> lines;
