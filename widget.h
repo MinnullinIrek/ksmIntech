@@ -29,7 +29,6 @@ protected:
     GLfloat xTimer = 0;
     GLfloat yTimer = 0.05;
     GLfloat zTimer = 0;
-    GLfloat alpha  = 0;
 
     QTimer timer;
     QList<Line> lines;
@@ -38,6 +37,10 @@ protected:
     GLfloat yCamera = 0;
     GLfloat zCamera = 0;
 
+    float delta = 0.01;
+private:
+    double num = 1;
+    int last = -1;
 
 protected:
     virtual void initializeGL() override;

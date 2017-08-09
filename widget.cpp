@@ -11,21 +11,22 @@ Widget::Widget(QWidget *p):QGLWidget(p)
 
 void Widget::recalcCoords()
 {
-    auto delta = 0.01;
     zTimer -= delta;
 
     if(zTimer < -flatSize*2 + lineSize*2){
         zTimer = 0;
         xTimer = 0;
         lines.clear();
+        num = 1;
+        last = 1;
     }
 
     xTimer = flatSize*sin(zTimer)/2;
-    alpha =  zTimer*180/3.14;
 
     zCamera = zTimer + flatSize -  sin(zTimer) * 0.1;
     xCamera = xTimer + cos(zTimer) * 0.1;
     yCamera = yTimer - flatSize + 0.1;
+
 
     updateGL();
 }
@@ -60,7 +61,6 @@ void Widget::paintGL()
     createFlat();
     drawTrack();
     drawLine(xTimer, yTimer - flatSize, zTimer + flatSize);
-
 }
 
 void Widget::mousePressEvent(QMouseEvent *pe)
@@ -93,11 +93,27 @@ void Widget::drawLine(double x, double y, double z)
 {
     z -= lineSize;
 
+    auto xnext = flatSize*sin(zTimer - delta)/2;
+    auto i = (xnext > x) ? -1:1;
+    auto a = -i*(180/3.14)*asin(delta/sqrt(delta * delta + (xnext - x)*(xnext - x)));
+
+    int current =0;
+    if(xnext - x > 0){
+        x -= lineSize;
+        current  = -1;
+    }
+    else current =1;
+    if(last + current == 0) num += 2;
+    last = current;
+
+    z += num * delta;
+
+
     auto x1 = x;
     auto z1 = z ;
 
-    auto x2 = x + lineSize*sin(alpha*3.14/180);
-    auto z2 = z + lineSize*cos(alpha*3.14/180);
+    auto x2 = x + lineSize*sin(a*3.14/180);
+    auto z2 = z + lineSize*cos(a*3.14/180);
 
     lines.push_back(Line(x1, y,  z1, x2, y, z2));
 
@@ -109,12 +125,15 @@ void Widget::drawLine(double x, double y, double z)
 
     glTranslated(x, y, z);
 
-    glRotated(alpha, 0, 1, 0);
+    glRotated(a, 0, 1, 0);
     glColor3d(1, 0, 0);
     gluCylinder(quadObj, 0.01, 0.01, lineSize, 15, 15);
 
     gluDeleteQuadric(quadObj);
 }
+
+
+
 
 void Widget::drawTrack()
 {
